@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 
+from typing import List, Set, Tuple, Collection, Dict
 
-def dayXX(filename):
+def dayXX(filename, expected=None):
     with open(filename, "r") as f:
-        data = f.readlines()
+        data = f.read()
+
+    result = 0
+    if expected:
+        assert result == expected, f"expected {expected}, got {result}"
 
 if __name__ == "__main__":
-    dayXX("dayXX.txt")
     dayXX("dayXX_small.txt")
+    dayXX("dayXX.txt")
