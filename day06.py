@@ -38,6 +38,17 @@ def parse(data) -> List[Race]:
     t = list(zip(*table))
     return [ Race(int(r[0]), int(r[1])) for r in t]
 
+def parse_part2(data) -> Race:
+    table = []
+    for line in data.split("\n"):
+        label, rest = line.split(":")
+        table.append(rest.split())
+
+    print(table)
+
+    return Race(int("".join(table[0])), int("".join(table[1])))
+
+
 
 
 def day06(filename, expected=None):
@@ -57,6 +68,23 @@ def day06(filename, expected=None):
         assert result == expected, f"expected {expected}, got {result}"
 
     print(result)
+
+def day06_part2(filename, expected=None):
+    with open(filename, "r") as f:
+        data = f.read().strip()
+
+    race = parse_part2(data)
+    print(race)
+
+
+    result = race.ways_to_wins()
+    if expected:
+        assert result == expected, f"expected {expected}, got {result}"
+
+    print(result)
 if __name__ == "__main__":
     day06("day06_small.txt", expected=288)
     day06("day06.txt")
+    day06_part2("day06_small.txt", expected=71503)
+    day06_part2("day06.txt")
+

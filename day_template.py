@@ -10,6 +10,8 @@ def dayXX(filename, expected=None):
     if expected:
         assert result == expected, f"expected {expected}, got {result}"
 
+    print(f"Result: {result}")
+
 if __name__ == "__main__":
     dayXX("dayXX_small.txt")
     dayXX("dayXX.txt")
