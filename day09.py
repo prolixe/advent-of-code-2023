@@ -16,6 +16,13 @@ def predict_next_elem(seq: List[int]) -> int:
     #print(seq, next_elem)
     return next_elem
 
+def predict_previous_elem(seq: List[int]) -> int:
+    if all(s == 0 for s in seq):
+        return 0
+    previous_elem = seq[0] - predict_previous_elem(diff_each_step(seq))
+
+    #print(seq, previous_elem)
+    return previous_elem
 
 
 def day09(filename, expected=None):
@@ -37,6 +44,27 @@ def day09(filename, expected=None):
 
     print(f"Result: {result}")
 
+def day09_part2(filename, expected=None):
+    with open(filename, "r") as f:
+        data = f.read().strip()
+
+    sequences = parse(data)
+
+    print(sequences)
+    sum_previous_elems = 0
+    for s in sequences:
+        previous_elem = predict_previous_elem(s)
+        print(previous_elem)
+        sum_previous_elems += previous_elem
+
+    result = sum_previous_elems
+    if expected:
+        assert result == expected, f"expected {expected}, got {result}"
+
+    print(f"Result: {result}")
+
 if __name__ == "__main__":
     day09("day09_small.txt", expected=114)
     day09("day09.txt")
+    day09_part2("day09_small.txt", expected=2)
+    day09_part2("day09.txt")
