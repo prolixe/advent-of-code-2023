@@ -90,6 +90,66 @@ def day11(filename, expected=None):
 
     print(f"Result: {result}")
 
+def find_factor_row(grid) -> List[int]:
+    factor = []
+    for i, row in enumerate(grid):
+        if not any(row):
+            factor.append(i)
+    return factor
+
+def find_expansion_factor(grid) -> Tuple[List[int], List[int]]:
+    row_factor = find_factor_row(grid)
+    new_grid = list(map(list, zip(*grid)))
+    col_factor = find_factor_row(new_grid)
+    return (col_factor, row_factor) # col is x, row is y
+
+def find_expanded_distance(g1, g2, exp_fac, factor: int):
+    # Calculate how much the empty space is worth
+    # if point x1 = 2 and point x2 = 4,
+    # and at point 3 there is a factor 100
+    # the distance between the 2 should be 4 - 2 + (factor -1) * number_of_empty_spaces = 102
+
+    x_fact, y_fact = exp_fac
+
+    min_x = min(g1.x, g2.x)
+    max_x = max(g1.x, g2.x)
+    min_y = min(g1.y, g2.y)
+    max_y = max(g1.y, g2.y)
+    # number of spaces between 2 x axis
+    x_between = len([f for f in x_fact if min_x < f < max_x])
+    y_between = len([f for f in y_fact if min_y < f < max_y])
+
+
+
+    return (max_x - min_x + x_between * (factor - 1)) + (max_y - min_y + y_between * (factor - 1))
+
+
+def day11_part2(filename, factor, expected=None):
+    with open(filename, "r") as f:
+        data = f.read().strip()
+
+    grid = parse(data)
+
+    galaxies = find_galaxies(grid)
+    #print(galaxies)
+    exp_fac = find_expansion_factor(grid)
+        
+    sum = 0
+    for pos, g1 in enumerate(galaxies):
+        for g2 in galaxies[pos:]:
+            sum += find_expanded_distance(g1, g2, exp_fac, factor)
+
+    
+    result = sum
+    if expected:
+        assert result == expected, f"expected {expected}, got {result}"
+
+    print(f"Result: {result}")
+
 if __name__ == "__main__":
-    day11("day11_small.txt", expected=374)
-    day11("day11.txt")
+    #day11("day11_small.txt", expected=374)
+    #day11("day11.txt")
+    day11_part2("day11_small.txt", factor=2, expected=374)
+    day11_part2("day11_small.txt", factor=10, expected=1030)
+    day11_part2("day11_small.txt", factor=100, expected=8410)
+    day11_part2("day11.txt", factor=1000000)
