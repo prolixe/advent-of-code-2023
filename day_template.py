@@ -4,7 +4,7 @@ from typing import List, Set, Tuple, Collection, Dict
 
 def dayXX(filename, expected=None):
     with open(filename, "r") as f:
-        data = f.read()
+        data = f.read().strip()
 
     result = 0
     if expected:
