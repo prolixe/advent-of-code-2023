@@ -4,7 +4,7 @@ from typing import List, Set, Tuple, Collection, Dict
 
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from copy import deepcopy
+import copy
 import time
 
 EMPTY = "."
@@ -181,6 +181,40 @@ def day16(filename, expected=None):
         beam = beams.pop()
         new_beams = grid.process_beam(beam)
         # show the grid while solving it
+        #print(grid)
+        #print(new_beams)
+        # Make sure to process the new beams first
+        new_beams.extend(beams)
+        beams = new_beams
+        time.sleep(0.01)
+        if grid.energized_count() == last_energized_count:
+            cycle_unchanged += 1
+        else:
+            last_energized_count = grid.energized_count()
+            cycle_unchanged = 0
+
+        #print("Cycle", cycle_unchanged)
+        if cycle_unchanged > 100:
+            print(f"No change detected for {cycle_unchanged} cycle, exiting")
+            break
+
+
+    result = grid.energized_count()
+    if expected:
+        assert result == expected, f"expected {expected}, got {result}"
+
+    print(f"Result: {result}")
+
+def count_energized(grid, start_beam) -> int:
+    beams = [start_beam]
+
+    cycle_unchanged = 0
+    last_energized_count = 0
+    while beams:
+        # take one beam
+        beam = beams.pop()
+        new_beams = grid.process_beam(beam)
+        # show the grid while solving it
         # print(grid)
         #print(new_beams)
         # Make sure to process the new beams first
@@ -194,12 +228,39 @@ def day16(filename, expected=None):
             cycle_unchanged = 0
 
         #print("Cycle", cycle_unchanged)
-        if cycle_unchanged > 500:
-            print(f"No change detected for {cycle_unchanged} cycle, exiting")
+        if cycle_unchanged > 100:
+            # print(f"No change detected for {cycle_unchanged} cycle, exiting")
             break
 
-
     result = grid.energized_count()
+    return result
+
+def day16_part2(filename, expected=None):
+    with open(filename, "r") as f:
+        data = f.read().strip()
+
+    grid = parse(data)
+
+    right_beams = [Beam(Direction.RIGHT, x=0,y=y) for y in range(0, len(grid.grid))]
+    left_beams = [Beam(Direction.LEFT, x=len(grid.grid[0])-1,y=y) for y in range(0, len(grid.grid))]
+    up_beams = [Beam(Direction.UP, x=x,y=len(grid.grid)-1) for x in range(0, len(grid.grid[0]))]
+    down_beams = [Beam(Direction.DOWN, x=x,y=0) for x in range(0, len(grid.grid[0]))]
+    start_beams = right_beams + left_beams + up_beams + down_beams
+
+
+    max_energized = 0
+    max_start_beam = None
+    for b in start_beams:
+        copied_grid = copy.deepcopy(grid)
+        energized_count = count_energized(copied_grid, b)
+        
+        if energized_count > max_energized:
+            max_energized = energized_count
+            max_start_beam = b
+
+    result = max_energized
+    print("Max start beam", max_start_beam)
+
     if expected:
         assert result == expected, f"expected {expected}, got {result}"
 
@@ -208,3 +269,5 @@ def day16(filename, expected=None):
 if __name__ == "__main__":
     day16("day16_small.txt", expected=46)
     day16("day16.txt")
+    day16_part2("day16_small.txt", expected=51)
+    day16_part2("day16.txt")
